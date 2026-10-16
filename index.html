@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>隨機獎品抽選器 - 今晚吃什麼？</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes prizePop {
+      0% { transform: scale(0.9); opacity: 0; }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .prize-pop {
+      animation: prizePop 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="fixed top-8 left-8 text-slate-400 font-semibold tracking-wide text-sm hidden sm:block">
+    你的應用名稱
+  </div>
+
+  <div class="w-full max-w-md bg-slate-800/50 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center">
+    
+    <div class="flex items-center gap-1.5 text-indigo-300 text-xs font-semibold mb-3">
+      <span>✨ 獎品抽獎</span>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-6">
+      試試手氣，今晚吃什麼？
+    </h1>
+
+    <div id="prizeTags" class="grid grid-cols-4 gap-2 w-full mb-6">
+      <div class="tag py-2 rounded-xl text-xs font-medium bg-slate-700/40 text-slate-300 border border-white/5 transition-all duration-150" data-name="拉麵">拉麵</div>
+      <div class="tag py-2 rounded-xl text-xs font-medium bg-slate-700/40 text-slate-300 border border-white/5 transition-all duration-150" data-name="雞排">雞排</div>
+      <div class="tag py-2 rounded-xl text-xs font-medium bg-slate-700/40 text-slate-300 border border-white/5 transition-all duration-150" data-name="火鍋">火鍋</div>
+      <div class="tag py-2 rounded-xl text-xs font-medium bg-slate-700/40 text-slate-300 border border-white/5 transition-all duration-150" data-name="咖哩飯">咖哩飯</div>
+    </div>
+
+    <div class="w-full bg-slate-900/80 border border-white/10 rounded-2xl p-8 mb-6 flex flex-col items-center justify-center min-h-[140px] shadow-inner">
+      <div id="resultText" class="text-4xl font-extrabold tracking-wide text-white">
+        火鍋
+      </div>
+      <div id="statusText" class="text-xs text-indigo-400 mt-2 font-medium">
+        點擊下方按鈕開始！
+      </div>
+    </div>
+
+    <button id="drawBtn" onclick="startDraw()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/30">
+      <span>🎲 再抽一次</span>
+    </button>
+  </div>
+
+  <script>
+    const prizes = ["拉麵", "雞排", "火鍋", "咖哩飯"];
+    let isRolling = false;
+
+    function startDraw() {
+      if (isRolling) return;
+      isRolling = true;
+
+      const btn = document.getElementById("drawBtn");
+      const resultText = document.getElementById("resultText");
+      const statusText = document.getElementById("statusText");
+      const tags = document.querySelectorAll(".tag");
+
+      btn.disabled = true;
+      statusText.innerText = "手氣抽獎中！";
+      resultText.classList.remove("prize-pop");
+
+      let rollInterval = setInterval(() => {
+        const tempIndex = Math.floor(Math.random() * prizes.length);
+        const currentItem = prizes[tempIndex];
+        resultText.innerText = currentItem;
+
+        tags.forEach(tag => {
+          if (tag.dataset.name === currentItem) {
+            tag.classList.add("bg-indigo-500/40", "border-indigo-400", "text-white");
+          } else {
+            tag.classList.remove("bg-indigo-500/40", "border-indigo-400", "text-white");
+          }
+        });
+      }, 60);
+
+      setTimeout(() => {
+        clearInterval(rollInterval);
+        
+        const finalWinner = prizes[Math.floor(Math.random() * prizes.length)];
+        resultText.innerText = finalWinner;
+        resultText.classList.add("prize-pop");
+        statusText.innerText = "已決定！";
+
+        tags.forEach(tag => {
+          if (tag.dataset.name === finalWinner) {
+            tag.classList.add("bg-indigo-500/50", "border-indigo-400", "text-white");
+          } else {
+            tag.classList.remove("bg-indigo-500/50", "border-indigo-400", "text-white");
+          }
+        });
+
+        isRolling = false;
+        btn.disabled = false;
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
